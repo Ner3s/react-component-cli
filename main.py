@@ -23,7 +23,7 @@ CheckPathIsValid.execute(params["path"])
 
 # Create files and folder structure
 try:
-  shutil.copytree(absPath, './components/Tester')
+  shutil.copytree(absPath, params["path"]+componentName)
 except:
   print('Somenthing went wrong')
   exit()
