@@ -1,34 +1,33 @@
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-import os
 import shutil
-import warnings
-warnings.simplefilter("ignore")
+import json
+import os
 
-from src.component import Component
+from src.CommandLine import CommandLine
+from src.ReplaceText import ReplaceText
+from src.CheckPathIsValid import CheckPathIsValid
 
-# test = Component('teste')
-# test.execute()
+# Execute command-line
+params = CommandLine.execute()
 
-# Parse command line arguments
-parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-parser.add_argument("-c", "--component", default="y", help="Create component [y = yes / n = no]")
-parser.add_argument("-t", "--test", default="y", help="Create test component [y = yes / n = no]")
-parser.add_argument("-s", "--style", default="y", help="Create styled-component [y = yes / n = no]")
-parser.add_argument("-n", "--name", default="componentName", help="Component name <nameForComponent>")
-parser.add_argument("-p", "--path", default="./", help="Add other path, ex.: ./src/components/")
-args = vars(parser.parse_args())
+# Convert values to json
+params = json.loads(params)
 
-# print(args["component"])
-# print(args["test"])
-# print(args["style"])
-# print(args["name"])
-# print(args["path"])
+# Get absolute project path
+absPath = os.path.dirname(__file__)+'/src/templates'
 
-# os.makedirs(os.path.dirname(args["path"]), exist_ok=True)
-# with open(args["path"]+args["name"], "w"):
-#   print("created "+args["path"]+args["name"])
+# Transform string in CammelCase
+componentName = params["name"][0].upper() + params["name"][1:]
 
+# Check path is correct
+CheckPathIsValid.execute(params["path"])
 
-shutil.copytree('src/templates', './'+args["name"])
+# Create files and folder structure
+try:
+  shutil.copytree(absPath, './components/Tester')
+except:
+  print('Somenthing went wrong')
+  exit()
+  
+# ReplaceText(params["path"]+componentName+'/index.tsx', "{{ComponentName}}", componentName)
 # shutil.copyfile('/src/templates/styles.template', os.path.dirname(args["path"]))
 # shutil.copyfile('/src/templates/test.template', os.path.dirname(args["path"]))
